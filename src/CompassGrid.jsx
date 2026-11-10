@@ -20,11 +20,10 @@ export default function CompassGrid({
     };
   };
 
-  // Başlık uzunluğuna göre dinamik font boyutu hesaplama
+  // Başlık uzunluğuna göre dinamik font boyutu
   const getDynamicTitleFontSize = (title = '') => {
     const len = title.trim().length;
-    // Izgara büyüdükçe temel katsayı küçülür
-    const baseScale = gridSize === 2 ? 1.5 : gridSize === 3 ? 1.2 : gridSize === 4 ? 1.0 : 0.75;
+    const baseScale = gridSize === 2 ? 1.45 : gridSize === 3 ? 1.15 : gridSize === 4 ? 0.98 : 0.72;
 
     let fontSizeRem;
     if (len <= 8) {
@@ -39,30 +38,30 @@ export default function CompassGrid({
       fontSizeRem = 0.6 * baseScale;
     }
 
-    return `clamp(${fontSizeRem * 0.75}rem, ${fontSizeRem * 1.3}cqw, ${fontSizeRem * 1.2}rem)`;
+    return `clamp(${fontSizeRem * 0.75}rem, ${fontSizeRem * 1.35}cqw, ${fontSizeRem * 1.2}rem)`;
   };
 
-  // Özellik maddelerinin toplam metin ve madde sayısına göre dinamik font boyutu
+  // Özellik maddeleri için dinamik font boyutu
   const getDynamicTraitsFontSize = (traits = []) => {
     const validTraits = traits.filter(Boolean);
     const count = validTraits.length;
     const totalChars = validTraits.join(' ').length;
-    const baseScale = gridSize === 2 ? 1.35 : gridSize === 3 ? 1.15 : gridSize === 4 ? 0.95 : 0.75;
+    const baseScale = gridSize === 2 ? 1.35 : gridSize === 3 ? 1.15 : gridSize === 4 ? 0.96 : 0.75;
 
     let fontSizeRem;
     if (count <= 1 && totalChars < 30) {
       fontSizeRem = 0.85 * baseScale;
     } else if (count <= 2 && totalChars < 60) {
-      fontSizeRem = 0.76 * baseScale;
+      fontSizeRem = 0.77 * baseScale;
     } else if (count <= 3 && totalChars < 100) {
-      fontSizeRem = 0.68 * baseScale;
+      fontSizeRem = 0.69 * baseScale;
     } else if (totalChars < 150) {
-      fontSizeRem = 0.6 * baseScale;
+      fontSizeRem = 0.61 * baseScale;
     } else {
-      fontSizeRem = 0.52 * baseScale;
+      fontSizeRem = 0.53 * baseScale;
     }
 
-    return `clamp(${fontSizeRem * 0.7}rem, ${fontSizeRem * 1.15}cqw, ${fontSizeRem}rem)`;
+    return `clamp(${fontSizeRem * 0.72}rem, ${fontSizeRem * 1.15}cqw, ${fontSizeRem}rem)`;
   };
 
   const gridStyle = {
@@ -79,7 +78,7 @@ export default function CompassGrid({
 
   return (
     <div className="relative w-full flex items-center justify-center p-1 sm:p-2 select-none">
-      <div id="political-compass-board" style={gridStyle} className="shadow-2xl overflow-hidden rounded-sm">
+      <div id="political-compass-board" style={gridStyle} className="shadow-2xl overflow-hidden rounded-sm relative">
         {Array.from({ length: gridSize }).map((_, r) =>
           Array.from({ length: gridSize }).map((_, c) => {
             const cell = getCellData(r, c);
@@ -92,7 +91,6 @@ export default function CompassGrid({
             const titleFontSize = getDynamicTitleFontSize(cell.title || '');
             const traitFontSize = getDynamicTraitsFontSize(cell.traits || []);
 
-            // Görsel boyutu grid boyutuna göre orantılı
             const imgBoxSize =
               gridSize === 2
                 ? 'w-24 h-24 sm:w-32 sm:h-32'
@@ -115,18 +113,21 @@ export default function CompassGrid({
                     : 'hover:brightness-95'
                 }`}
               >
+                {/* İnce gren / parazit dokusu */}
+                <div className="absolute inset-0 pointer-events-none compass-noise-overlay opacity-30" />
+
                 {/* Eksen ayrım çizgileri */}
                 {isCenterHoriz && (
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black/50 pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black/50 pointer-events-none z-10" />
                 )}
                 {isCenterVert && (
-                  <div className="absolute top-0 bottom-0 right-0 w-[2px] bg-black/50 pointer-events-none" />
+                  <div className="absolute top-0 bottom-0 right-0 w-[2px] bg-black/50 pointer-events-none z-10" />
                 )}
 
                 {/* Üst Kısım: Fotoğraf (Sol) + Dinamik Başlık (Sağ) */}
-                <div className="flex items-start gap-1.5 sm:gap-2">
+                <div className="flex items-start gap-1.5 sm:gap-2 z-10">
                   {/* Fotoğraf Kutusu */}
-                  <div className={`relative shrink-0 ${imgBoxSize} bg-black/10 rounded overflow-hidden border border-black/30 shadow-sm flex items-center justify-center`}>
+                  <div className={`relative shrink-0 ${imgBoxSize} bg-black/10 rounded overflow-hidden border border-black/35 shadow-sm flex items-center justify-center`}>
                     {cell.image ? (
                       <img
                         src={cell.image}
@@ -142,14 +143,13 @@ export default function CompassGrid({
                     )}
                   </div>
 
-                  {/* Dinamik Boyutlanan Başlık */}
+                  {/* Dinamik Boyutlanan Başlık - Arimo / Helvetica Parazitli Meme Fontu */}
                   <div className="flex-1 min-w-0 flex items-center py-0.5">
                     <h3
-                      className="font-extrabold text-black leading-tight tracking-tight break-words"
+                      className="meme-font-title break-words"
                       style={{
                         fontSize: titleFontSize,
-                        lineHeight: 1.1,
-                        fontFamily: "'Impact', 'Arial Black', -apple-system, sans-serif"
+                        lineHeight: 1.08,
                       }}
                     >
                       {cell.title || (
@@ -162,17 +162,16 @@ export default function CompassGrid({
                 </div>
 
                 {/* Alt Kısım: Dinamik Boyutlanan Özellik Maddeleri */}
-                <div className="mt-1.5 sm:mt-2 flex-1 flex flex-col justify-start overflow-hidden">
+                <div className="mt-1.5 sm:mt-2 flex-1 flex flex-col justify-start overflow-hidden z-10">
                   <div className="space-y-0.5">
                     {cell.traits && cell.traits.length > 0 ? (
                       cell.traits.filter(Boolean).map((trait, idx) => (
                         <div
                           key={idx}
-                          className="font-bold text-black flex items-start gap-1"
+                          className="meme-font-body flex items-start gap-1"
                           style={{
                             fontSize: traitFontSize,
-                            lineHeight: 1.18,
-                            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+                            lineHeight: 1.16,
                           }}
                         >
                           <span className="select-none font-black text-black shrink-0">-</span>
@@ -191,7 +190,7 @@ export default function CompassGrid({
 
                 {/* Hücre Koordinatı */}
                 {!isExporting && (
-                  <div className="absolute bottom-0.5 right-1 text-[8px] font-mono text-black/25">
+                  <div className="absolute bottom-0.5 right-1 text-[8px] font-mono text-black/25 z-10">
                     [{r},{c}]
                   </div>
                 )}
