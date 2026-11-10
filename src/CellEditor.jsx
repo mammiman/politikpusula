@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Upload, Trash2, Plus, X, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { Upload, Trash2, Plus, X, Image as ImageIcon } from 'lucide-react';
 import { getQuadrantColor } from './constants';
 
 export default function CellEditor({
@@ -12,11 +12,13 @@ export default function CellEditor({
 
   if (!cell) {
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 text-center text-slate-400">
-        <Sparkles className="mx-auto mb-3 opacity-50" size={32} />
-        <h4 className="font-semibold text-slate-200 mb-1">Hücre Seçilmedi</h4>
-        <p className="text-xs text-slate-400">
-          Düzenlemek istediğiniz karakter kutusuna pusula tablosundan tıklayın.
+      <div className="bg-white border border-gray-200 rounded-lg p-6 text-center text-gray-500 shadow-sm">
+        <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+          <ImageIcon size={20} />
+        </div>
+        <h4 className="font-semibold text-gray-800 text-sm mb-1">Hücre Seçilmedi</h4>
+        <p className="text-xs text-gray-500">
+          Düzenlemek istediğiniz karakter kutusuna tablodan tıklayın.
         </p>
       </div>
     );
@@ -63,22 +65,22 @@ export default function CellEditor({
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl flex flex-col gap-4">
+    <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col gap-4 text-gray-800">
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+      <div className="flex items-center justify-between pb-3 border-b border-gray-100">
         <div className="flex items-center gap-2">
           <span
-            className="w-3.5 h-3.5 rounded-full border border-black/20"
+            className="w-4 h-4 rounded border border-gray-400 shrink-0"
             style={{ backgroundColor: quadrant.bg }}
           />
           <div>
-            <h3 className="font-bold text-sm text-slate-100 flex items-center gap-2">
-              Karakter Düzenle
-              <span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">
-                [{cell.row + 1}, {cell.col + 1}]
+            <h3 className="font-bold text-sm text-gray-900 flex items-center gap-1.5">
+              Hücre Düzenle
+              <span className="text-[11px] px-1.5 py-0.2 rounded bg-gray-100 text-gray-600 font-mono border border-gray-200">
+                {cell.row + 1}, {cell.col + 1}
               </span>
             </h3>
-            <span className="text-[11px] text-slate-400 font-medium">
+            <span className="text-[11px] text-gray-500 font-medium">
               {quadrant.name}
             </span>
           </div>
@@ -86,7 +88,7 @@ export default function CellEditor({
 
         <button
           onClick={handleClearCell}
-          className="text-xs text-red-400 hover:text-red-300 hover:bg-red-950/40 px-2 py-1 rounded transition flex items-center gap-1"
+          className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 border border-transparent hover:border-red-200 px-2 py-1 rounded transition flex items-center gap-1"
           title="Kutuyu Temizle"
         >
           <Trash2 size={13} /> Temizle
@@ -96,11 +98,11 @@ export default function CellEditor({
       {/* Resim Yükleme & Başlık */}
       <div className="space-y-3">
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
-            Karakter / Kişi Görseli
+          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+            Karakter / Kişi Fotoğrafı
           </label>
           <div className="flex items-center gap-3">
-            <div className="relative w-20 h-20 rounded-lg bg-slate-950 border border-slate-700 flex items-center justify-center overflow-hidden shrink-0">
+            <div className="relative w-20 h-20 rounded bg-gray-50 border border-gray-300 flex items-center justify-center overflow-hidden shrink-0">
               {cell.image ? (
                 <>
                   <img
@@ -110,17 +112,17 @@ export default function CellEditor({
                   />
                   <button
                     onClick={() => onUpdateCell({ ...cell, image: null })}
-                    className="absolute top-1 right-1 bg-black/70 hover:bg-red-600 text-white p-1 rounded-full text-xs transition"
+                    className="absolute top-1 right-1 bg-black/60 hover:bg-red-600 text-white p-1 rounded-full text-xs transition"
                   >
                     <X size={12} />
                   </button>
                 </>
               ) : (
-                <ImageIcon className="text-slate-600" size={24} />
+                <ImageIcon className="text-gray-400" size={24} />
               )}
             </div>
 
-            <div className="flex-1 space-y-2">
+            <div className="flex-1 space-y-1.5">
               <input
                 type="file"
                 ref={fileInputRef}
@@ -131,16 +133,16 @@ export default function CellEditor({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full py-2 px-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition"
+                className="w-full py-1.5 px-3 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 border border-gray-300 rounded text-xs font-medium flex items-center justify-center gap-1.5 shadow-sm transition"
               >
-                <Upload size={14} /> Bilgisayardan Fotoğraf Yükle
+                <Upload size={13} /> Dosyadan Fotoğraf Seç
               </button>
               <input
                 type="text"
-                placeholder="Veya Görsel URL'si yapıştır..."
+                placeholder="veya Görsel URL'si yapıştırın..."
                 value={cell.image?.startsWith('data:') ? '' : (cell.image || '')}
                 onChange={(e) => onUpdateCell({ ...cell, image: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-white border border-gray-300 rounded px-2.5 py-1 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-gray-500"
               />
             </div>
           </div>
@@ -148,29 +150,29 @@ export default function CellEditor({
 
         {/* Karakter Başlığı */}
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1">
+          <label className="block text-xs font-semibold text-gray-700 mb-1">
             Karakter İsmi / Unvanı
           </label>
           <input
             type="text"
-            placeholder="Örn: cezaevi müdürü, Garibin bacısı..."
+            placeholder="Örn: cezaevi müdürü, Sazcı mahkum..."
             value={cell.title || ''}
             onChange={(e) => onUpdateCell({ ...cell, title: e.target.value })}
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-semibold"
+            className="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-500 font-semibold shadow-sm"
           />
         </div>
       </div>
 
       {/* Maddeler / Özellikler */}
-      <div className="space-y-2">
+      <div className="space-y-2 pt-1 border-t border-gray-100">
         <div className="flex items-center justify-between">
-          <label className="text-xs font-semibold text-slate-300">
-            Özellikler / Maddeler (Meme açıklamaları)
+          <label className="text-xs font-semibold text-gray-700">
+            Özellikler / Maddeler
           </label>
           <button
             type="button"
             onClick={handleAddTrait}
-            className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1"
+            className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
           >
             <Plus size={13} /> Madde Ekle
           </button>
@@ -178,24 +180,24 @@ export default function CellEditor({
 
         <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
           {(!cell.traits || cell.traits.length === 0) ? (
-            <p className="text-xs text-slate-500 italic py-2 text-center">
-              Henüz madde eklenmedi. "Madde Ekle"ye basarak yazmaya başlayın.
+            <p className="text-xs text-gray-400 italic py-2 text-center">
+              Henüz madde yok. "Madde Ekle"ye basarak yazabilirsiniz.
             </p>
           ) : (
             cell.traits.map((trait, idx) => (
               <div key={idx} className="flex items-center gap-1.5">
-                <span className="text-slate-500 text-sm font-bold select-none">-</span>
+                <span className="text-gray-400 text-sm font-bold select-none">-</span>
                 <input
                   type="text"
-                  placeholder="Madde metni..."
+                  placeholder="Madde açıklaması..."
                   value={trait}
                   onChange={(e) => handleUpdateTrait(idx, e.target.value)}
-                  className="flex-1 bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500"
+                  className="flex-1 bg-white border border-gray-300 rounded px-2.5 py-1.5 text-xs text-gray-800 placeholder-gray-400 focus:outline-none focus:border-gray-500"
                 />
                 <button
                   type="button"
                   onClick={() => handleRemoveTrait(idx)}
-                  className="text-slate-500 hover:text-red-400 p-1 rounded"
+                  className="text-gray-400 hover:text-red-500 p-1 rounded transition"
                 >
                   <X size={14} />
                 </button>

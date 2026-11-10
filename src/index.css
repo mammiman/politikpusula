@@ -4,8 +4,8 @@
   body {
     margin: 0;
     padding: 0;
-    background-color: #090d16;
-    color: #f8fafc;
+    background-color: #f8fafc;
+    color: #0f172a;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 }
@@ -16,7 +16,6 @@
   font-weight: 800;
   letter-spacing: -0.035em;
   color: #050505;
-  /* Hafif grenli/basık CRT & JPEG antialiasing paraziti efekti */
   text-shadow: 0.25px 0.25px 0px rgba(0, 0, 0, 0.4), -0.2px 0 0 rgba(0, 0, 0, 0.15);
   -webkit-font-smoothing: antialiased;
 }
@@ -26,28 +25,27 @@
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #0a0a0a;
-  /* İnce kenar paraziti */
   text-shadow: 0.2px 0.2px 0px rgba(0, 0, 0, 0.25);
 }
 
-/* Tahta üzerine opsiyonel hafif film greni / JPEG paraziti dokusu */
+/* Tahta üzerine hafif film greni / JPEG paraziti dokusu */
 .compass-noise-overlay {
   background-image: radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 0);
   background-size: 3px 3px;
 }
 
-/* Custom scrollbars */
+/* Sade temiz scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 4px;
+  background: #cbd5e1;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: #94a3b8;
 }

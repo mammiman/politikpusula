@@ -1,32 +1,25 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { 
   Download, 
   RotateCcw, 
   FileSpreadsheet, 
   Sparkles, 
-  Grid3X3, 
-  Image as ImageIcon, 
-  Share2, 
   Upload, 
-  FileText,
-  HelpCircle,
-  Eye
+  HelpCircle
 } from 'lucide-react';
-import { toPng, toJpeg } from 'html-to-image';
+import { toPng } from 'html-to-image';
 import download from 'downloadjs';
-import confetti from 'canvas-confetti';
 
 import CompassGrid from './CompassGrid';
 import CellEditor from './CellEditor';
 import { createInitialGrid, DEMO_PRESET_4X4 } from './constants';
 
 export default function App() {
-  const [gridSize, setGridSize] = useState(4); // 2, 4, 6
+  const [gridSize, setGridSize] = useState(4);
   const [cells, setCells] = useState(() => createInitialGrid(4));
   const [selectedCellId, setSelectedCellId] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
   const [boardTitle, setBoardTitle] = useState('POLİTİK PUSULA');
-  const [compassTheme, setCompassTheme] = useState('classic'); // classic vs custom
 
   const selectedCell = cells.find(c => c.id === selectedCellId) || null;
 
@@ -42,9 +35,8 @@ export default function App() {
 
   const handleGridSizeChange = (newSize) => {
     if (newSize === gridSize) return;
-    if (confirm(`${newSize}x${newSize} boyutuna geçmek istiyor musunuz? Mevcut hücreler yeniden konumlandırılacak.`)) {
+    if (confirm(`${newSize}x${newSize} boyutuna geçmek istiyor musunuz?`)) {
       setGridSize(newSize);
-      // Yeni boyut için hücreleri oluştur, var olanları koru
       const newGrid = [];
       for (let r = 0; r < newSize; r++) {
         for (let c = 0; c < newSize; c++) {
@@ -69,7 +61,7 @@ export default function App() {
   };
 
   const handleLoadDemo = () => {
-    if (confirm('Örnek şablon yüklensin mi? Mevcut içerikleriniz değişecektir.')) {
+    if (confirm('Örnek şablon yüklensin mi? Mevcut içerikler değişecektir.')) {
       setGridSize(4);
       const demoCells = [];
       for (let r = 0; r < 4; r++) {
@@ -92,7 +84,7 @@ export default function App() {
   };
 
   const handleReset = () => {
-    if (confirm('Tüm pusulayı sıfırlamak istediğinize emin misiniz?')) {
+    if (confirm('Tüm pusulayı temizlemek istediğinize emin misiniz?')) {
       setCells(createInitialGrid(gridSize));
       setSelectedCellId(null);
     }
@@ -104,30 +96,23 @@ export default function App() {
 
     try {
       setIsExporting(true);
-      // Kısa bir bekleme render tamamlansın
       await new Promise(r => setTimeout(r, 150));
 
       const dataUrl = await toPng(node, {
         quality: 1.0,
-        pixelRatio: 2, // Yüksek çözünürlük / HD kalite
+        pixelRatio: 2,
         cacheBust: true,
       });
 
       download(dataUrl, `politik-pusula-${Date.now()}.png`, 'image/png');
-      confetti({
-        particleCount: 80,
-        spread: 60,
-        origin: { y: 0.7 }
-      });
     } catch (err) {
       console.error('Dışa aktarma hatası:', err);
-      alert('Görsel oluşturulurken bir hata meydana geldi: ' + err.message);
+      alert('Görsel oluşturulurken hata oluştu: ' + err.message);
     } finally {
       setIsExporting(false);
     }
   };
 
-  // JSON olarak kaydet ve yükle
   const handleExportJSON = () => {
     const data = {
       title: boardTitle,
@@ -135,7 +120,7 @@ export default function App() {
       cells
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    download(blob, `pusula-proje-${Date.now()}.json`, 'application/json');
+    download(blob, `pusula-${Date.now()}.json`, 'application/json');
   };
 
   const handleImportJSON = (e) => {
@@ -151,101 +136,88 @@ export default function App() {
           setCells(parsed.cells);
           if (parsed.title) setBoardTitle(parsed.title);
           setSelectedCellId(null);
-          alert('Proje başarıyla yüklendi!');
         } else {
           alert('Geçersiz dosya formatı.');
         }
       } catch (err) {
-        alert('Dosya okunurken hata: ' + err.message);
+        alert('Dosya okunamadı: ' + err.message);
       }
     };
     reader.readAsText(file);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      {/* Üst Navigasyon Çubuğu */}
-      <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-30 px-4 py-3">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-red-500 via-blue-500 to-amber-400 p-[2px] shadow-lg">
-              <div className="w-full h-full bg-slate-950 rounded-[6px] flex items-center justify-center font-black text-sm tracking-tighter">
-                PC
-              </div>
-            </div>
-            <div>
-              <h1 className="text-lg font-black tracking-tight text-white flex items-center gap-2">
-                Politik Pusula Oluşturucu
-                <span className="text-[10px] bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 px-2 py-0.5 rounded-full font-mono uppercase tracking-wider">
-                  Meme Compass
-                </span>
-              </h1>
-              <p className="text-xs text-slate-400 hidden sm:block">
-                Wojak & Meme tarzı 4x4, 2x2 veya 6x6 politik pusula hazırlayın ve HD indirin
-              </p>
-            </div>
+    <div className="min-h-screen bg-[#f4f5f7] text-gray-900 flex flex-col font-sans">
+      {/* Basit, Temiz Beyaz Üst Bar */}
+      <header className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-30 shadow-xs">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span className="font-bold text-base tracking-tight text-gray-900">
+              Politik Pusula Oluşturucu
+            </span>
+            <span className="text-xs text-gray-400 font-normal">| 4x4 & 2x2 Meme Generator</span>
           </div>
 
-          {/* Aksiyon Butonları */}
+          {/* Standart Düğmeler */}
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={handleLoadDemo}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5"
+              className="text-xs font-medium px-2.5 py-1.5 rounded bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 shadow-2xs transition flex items-center gap-1.5"
             >
-              <Sparkles size={14} className="text-amber-400" />
-              Örnek Şablonu Yükle
+              <Sparkles size={13} className="text-amber-500" />
+              Örnek Şablon
             </button>
 
             <button
               onClick={handleReset}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-red-400 border border-slate-700 transition flex items-center gap-1.5"
+              className="text-xs font-medium px-2.5 py-1.5 rounded bg-white hover:bg-red-50 text-red-600 border border-gray-300 hover:border-red-300 transition flex items-center gap-1.5"
             >
-              <RotateCcw size={14} />
+              <RotateCcw size={13} />
               Sıfırla
             </button>
 
-            <label className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition cursor-pointer flex items-center gap-1.5">
-              <Upload size={14} />
+            <label className="text-xs font-medium px-2.5 py-1.5 rounded bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 shadow-2xs transition cursor-pointer flex items-center gap-1.5">
+              <Upload size={13} />
               İçe Aktar
               <input type="file" accept=".json" onChange={handleImportJSON} className="hidden" />
             </label>
 
             <button
               onClick={handleExportJSON}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5"
+              className="text-xs font-medium px-2.5 py-1.5 rounded bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 shadow-2xs transition flex items-center gap-1.5"
             >
-              <FileSpreadsheet size={14} />
-              JSON Kaydet
+              <FileSpreadsheet size={13} />
+              JSON
             </button>
 
             <button
               onClick={handleExportPNG}
               disabled={isExporting}
-              className="text-xs font-bold px-4 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white shadow-lg shadow-indigo-500/25 transition flex items-center gap-1.5 active:scale-95 disabled:opacity-50"
+              className="text-xs font-semibold px-3 py-1.5 rounded bg-gray-900 hover:bg-black text-white shadow-xs transition flex items-center gap-1.5 active:scale-98 disabled:opacity-50"
             >
-              <Download size={15} />
-              {isExporting ? 'Oluşturuluyor...' : 'PNG İndir (HD)'}
+              <Download size={13} />
+              {isExporting ? 'Kaydediliyor...' : 'PNG İndir'}
             </button>
           </div>
         </div>
       </header>
 
-      {/* Ana Çalışma Alanı */}
+      {/* Ana Gövde */}
       <main className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Sol Panel: Pusula Tablosu ve Boyut Seçici */}
-        <section className="lg:col-span-8 flex flex-col gap-4">
-          {/* Kontrol Şeridi */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 shadow-md">
+        {/* Sol Kolon: Pusula Tablosu */}
+        <section className="lg:col-span-8 flex flex-col gap-3">
+          {/* Araç Çubuğu */}
+          <div className="bg-white border border-gray-200 rounded-lg p-3 flex flex-wrap items-center justify-between gap-3 shadow-2xs">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-400">Izgara Boyutu:</span>
+              <span className="text-xs font-medium text-gray-600">Boyut:</span>
               {[2, 3, 4, 6].map(size => (
                 <button
                   key={size}
                   onClick={() => handleGridSizeChange(size)}
-                  className={`px-3 py-1 text-xs font-bold rounded-md transition ${
+                  className={`px-2.5 py-1 text-xs font-semibold rounded transition border ${
                     gridSize === size
-                      ? 'bg-indigo-600 text-white shadow'
-                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                      ? 'bg-gray-900 text-white border-gray-900'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   {size}x{size}
@@ -254,40 +226,40 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-2 flex-1 max-w-xs">
-              <span className="text-xs font-semibold text-slate-400 shrink-0">Başlık:</span>
+              <span className="text-xs font-medium text-gray-600 shrink-0">Başlık:</span>
               <input
                 type="text"
                 value={boardTitle}
                 onChange={(e) => setBoardTitle(e.target.value)}
                 placeholder="Pusula Başlığı..."
-                className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                className="w-full bg-white border border-gray-300 rounded px-2.5 py-1 text-xs text-gray-900 focus:outline-none focus:border-gray-500"
               />
             </div>
           </div>
 
-          {/* Pusula Başlığı (Varsa) */}
+          {/* Pusula Başlığı */}
           {boardTitle && (
-            <div className="text-center py-1">
-              <h2 className="text-xl md:text-2xl font-black uppercase tracking-wider text-slate-100 drop-shadow">
+            <div className="text-center pt-1">
+              <h2 className="text-lg md:text-xl font-bold uppercase tracking-wide text-gray-900">
                 {boardTitle}
               </h2>
             </div>
           )}
 
-          {/* Eksen Etiketleri ve Izgara Konteyneri */}
-          <div className="relative bg-slate-900/60 border border-slate-800 rounded-2xl p-4 md:p-6 flex flex-col items-center justify-center">
-            {/* Üst Etiket: Otoriter */}
-            <div className="mb-2 text-xs font-black tracking-widest text-red-400 uppercase select-none flex items-center gap-1.5">
-              <span>▲</span> OTORİTER (AUTHORITARIAN)
+          {/* Tablo Çerçevesi */}
+          <div className="relative bg-white border border-gray-200 rounded-lg p-3 sm:p-5 flex flex-col items-center justify-center shadow-xs">
+            {/* Üst Etiket */}
+            <div className="mb-1.5 text-xs font-bold tracking-wider text-red-700 uppercase select-none">
+              ▲ OTORİTER (AUTHORITARIAN)
             </div>
 
             <div className="relative w-full flex items-center justify-center">
-              {/* Sol Etiket: Sol */}
-              <div className="absolute -left-2 sm:left-0 top-1/2 -translate-y-1/2 -rotate-90 text-[10px] sm:text-xs font-black tracking-widest text-red-400 uppercase select-none origin-center pointer-events-none">
-                ◄ SOL (LEFT)
+              {/* Sol Etiket */}
+              <div className="absolute -left-3 sm:-left-1 top-1/2 -translate-y-1/2 -rotate-90 text-[10px] sm:text-xs font-bold tracking-wider text-red-700 uppercase select-none origin-center pointer-events-none">
+                ◄ SOL
               </div>
 
-              {/* Ana Pusula Tablosu */}
+              {/* Pusula Tablosu */}
               <CompassGrid
                 gridSize={gridSize}
                 cells={cells}
@@ -296,29 +268,26 @@ export default function App() {
                 isExporting={isExporting}
               />
 
-              {/* Sağ Etiket: Sağ */}
-              <div className="absolute -right-2 sm:right-0 top-1/2 -translate-y-1/2 rotate-90 text-[10px] sm:text-xs font-black tracking-widest text-blue-400 uppercase select-none origin-center pointer-events-none">
-                SAĞ (RIGHT) ►
+              {/* Sağ Etiket */}
+              <div className="absolute -right-3 sm:-right-1 top-1/2 -translate-y-1/2 rotate-90 text-[10px] sm:text-xs font-bold tracking-wider text-blue-700 uppercase select-none origin-center pointer-events-none">
+                SAĞ ►
               </div>
             </div>
 
-            {/* Alt Etiket: Özgürlükçü */}
-            <div className="mt-2 text-xs font-black tracking-widest text-emerald-400 uppercase select-none flex items-center gap-1.5">
-              <span>▼</span> ÖZGÜRLÜKÇÜ (LIBERTARIAN)
+            {/* Alt Etiket */}
+            <div className="mt-1.5 text-xs font-bold tracking-wider text-emerald-700 uppercase select-none">
+              ▼ ÖZGÜRLÜKÇÜ (LIBERTARIAN)
             </div>
           </div>
 
-          {/* Hızlı Bilgilendirme */}
-          <div className="bg-slate-900/40 border border-slate-800/80 rounded-xl p-3 text-xs text-slate-400 flex items-start gap-2.5">
-            <HelpCircle size={16} className="text-indigo-400 shrink-0 mt-0.5" />
-            <p>
-              Tablodaki herhangi bir kutuya tıklayarak o karakterin resmini yükleyebilir, başlığını ve tire (-) ile ayrılan özellik maddelerini düzenleyebilirsiniz. Hazır olduğunda <strong>"PNG İndir (HD)"</strong> butonuna basarak yüksek kaliteli görsel elde edebilirsiniz.
-            </p>
+          <div className="text-xs text-gray-500 flex items-center gap-1.5 px-1">
+            <HelpCircle size={14} className="text-gray-400 shrink-0" />
+            <span>Kutulara tıklayarak resim, başlık ve açıklamaları değiştirebilirsiniz.</span>
           </div>
         </section>
 
-        {/* Sağ Panel: Hücre Editörü */}
-        <section className="lg:col-span-4 sticky top-20 flex flex-col gap-4">
+        {/* Sağ Kolon: Editör */}
+        <section className="lg:col-span-4 sticky top-16 flex flex-col gap-3">
           <CellEditor
             cell={selectedCell}
             gridSize={gridSize}
@@ -326,34 +295,29 @@ export default function App() {
             onClose={() => setSelectedCellId(null)}
           />
 
-          {/* Çeyrek Renk Rehberi */}
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs space-y-2">
-            <h4 className="font-bold text-slate-300 mb-2">Pusula Bölgeleri & Anlamları:</h4>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="p-2 rounded bg-red-950/40 border border-red-800/40">
-                <span className="font-bold text-red-300 block">Kırmızı (Auth-Left)</span>
-                <span className="text-[11px] text-slate-400">Otoriter Sol</span>
+          {/* Renk Çeyrekleri Bilgisi */}
+          <div className="bg-white border border-gray-200 rounded-lg p-3 text-xs space-y-1.5 shadow-2xs">
+            <div className="font-semibold text-gray-700 mb-1">Çeyrek Renkleri:</div>
+            <div className="grid grid-cols-2 gap-1.5">
+              <div className="p-1.5 rounded border border-red-200 bg-red-50 text-red-900">
+                <span className="font-bold block">Kırmızı</span> Otoriter Sol
               </div>
-              <div className="p-2 rounded bg-blue-950/40 border border-blue-800/40">
-                <span className="font-bold text-blue-300 block">Mavi (Auth-Right)</span>
-                <span className="text-[11px] text-slate-400">Otoriter Sağ</span>
+              <div className="p-1.5 rounded border border-blue-200 bg-blue-50 text-blue-900">
+                <span className="font-bold block">Mavi</span> Otoriter Sağ
               </div>
-              <div className="p-2 rounded bg-emerald-950/40 border border-emerald-800/40">
-                <span className="font-bold text-emerald-300 block">Yeşil (Lib-Left)</span>
-                <span className="text-[11px] text-slate-400">Özgürlükçü Sol</span>
+              <div className="p-1.5 rounded border border-green-200 bg-green-50 text-green-900">
+                <span className="font-bold block">Yeşil</span> Özgürlükçü Sol
               </div>
-              <div className="p-2 rounded bg-amber-950/40 border border-amber-800/40">
-                <span className="font-bold text-amber-300 block">Sarı (Lib-Right)</span>
-                <span className="text-[11px] text-slate-400">Özgürlükçü Sağ</span>
+              <div className="p-1.5 rounded border border-yellow-200 bg-yellow-50 text-yellow-900">
+                <span className="font-bold block">Sarı</span> Özgürlükçü Sağ
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="mt-auto border-t border-slate-900 py-4 text-center text-xs text-slate-500">
-        Politik Pusula Oluşturucu • GitHub Pages uyumlu React uygulaması
+      <footer className="mt-auto border-t border-gray-200 bg-white py-3 text-center text-xs text-gray-500">
+        Politik Pusula Oluşturucu
       </footer>
     </div>
   );
