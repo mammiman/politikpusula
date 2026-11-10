@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { Upload, X, Plus, Trash2 } from 'lucide-react';
+import React from 'react';
+import { Upload } from 'lucide-react';
 import { getQuadrantColor } from './constants';
 
 export default function CompassGrid({
@@ -20,21 +20,65 @@ export default function CompassGrid({
     };
   };
 
-  // Dinamik grid-template-columns
+  // Başlık uzunluğuna göre dinamik font boyutu hesaplama
+  const getDynamicTitleFontSize = (title = '') => {
+    const len = title.trim().length;
+    // Izgara büyüdükçe temel katsayı küçülür
+    const baseScale = gridSize === 2 ? 1.5 : gridSize === 3 ? 1.2 : gridSize === 4 ? 1.0 : 0.75;
+
+    let fontSizeRem;
+    if (len <= 8) {
+      fontSizeRem = 1.05 * baseScale;
+    } else if (len <= 15) {
+      fontSizeRem = 0.92 * baseScale;
+    } else if (len <= 25) {
+      fontSizeRem = 0.8 * baseScale;
+    } else if (len <= 40) {
+      fontSizeRem = 0.7 * baseScale;
+    } else {
+      fontSizeRem = 0.6 * baseScale;
+    }
+
+    return `clamp(${fontSizeRem * 0.75}rem, ${fontSizeRem * 1.3}cqw, ${fontSizeRem * 1.2}rem)`;
+  };
+
+  // Özellik maddelerinin toplam metin ve madde sayısına göre dinamik font boyutu
+  const getDynamicTraitsFontSize = (traits = []) => {
+    const validTraits = traits.filter(Boolean);
+    const count = validTraits.length;
+    const totalChars = validTraits.join(' ').length;
+    const baseScale = gridSize === 2 ? 1.35 : gridSize === 3 ? 1.15 : gridSize === 4 ? 0.95 : 0.75;
+
+    let fontSizeRem;
+    if (count <= 1 && totalChars < 30) {
+      fontSizeRem = 0.85 * baseScale;
+    } else if (count <= 2 && totalChars < 60) {
+      fontSizeRem = 0.76 * baseScale;
+    } else if (count <= 3 && totalChars < 100) {
+      fontSizeRem = 0.68 * baseScale;
+    } else if (totalChars < 150) {
+      fontSizeRem = 0.6 * baseScale;
+    } else {
+      fontSizeRem = 0.52 * baseScale;
+    }
+
+    return `clamp(${fontSizeRem * 0.7}rem, ${fontSizeRem * 1.15}cqw, ${fontSizeRem}rem)`;
+  };
+
   const gridStyle = {
     display: 'grid',
     gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
     aspectRatio: '1 / 1',
     width: '100%',
-    maxWidth: isExporting ? '1200px' : '900px',
+    maxWidth: isExporting ? '1200px' : '950px',
     margin: '0 auto',
     backgroundColor: '#000000',
-    gap: '2px', // Ayrım çizgileri
+    gap: '2px',
     border: '3px solid #000000',
   };
 
   return (
-    <div className="relative w-full flex items-center justify-center p-2 select-none">
+    <div className="relative w-full flex items-center justify-center p-1 sm:p-2 select-none">
       <div id="political-compass-board" style={gridStyle} className="shadow-2xl overflow-hidden rounded-sm">
         {Array.from({ length: gridSize }).map((_, r) =>
           Array.from({ length: gridSize }).map((_, c) => {
@@ -42,9 +86,21 @@ export default function CompassGrid({
             const quadrant = getQuadrantColor(r, c, gridSize, gridSize);
             const isSelected = selectedCellId === cell.id;
 
-            // Pusulanın orta eksen çizgilerini daha kalın/belirgin yap
             const isCenterHoriz = r === gridSize / 2 - 1;
             const isCenterVert = c === gridSize / 2 - 1;
+
+            const titleFontSize = getDynamicTitleFontSize(cell.title || '');
+            const traitFontSize = getDynamicTraitsFontSize(cell.traits || []);
+
+            // Görsel boyutu grid boyutuna göre orantılı
+            const imgBoxSize =
+              gridSize === 2
+                ? 'w-24 h-24 sm:w-32 sm:h-32'
+                : gridSize === 3
+                ? 'w-18 h-18 sm:w-24 sm:h-24'
+                : gridSize === 4
+                ? 'w-14 h-14 sm:w-20 sm:h-20'
+                : 'w-10 h-10 sm:w-14 sm:h-14';
 
             return (
               <div
@@ -53,24 +109,24 @@ export default function CompassGrid({
                 style={{
                   backgroundColor: quadrant.bg,
                 }}
-                className={`relative flex flex-col justify-between p-2.5 transition-all duration-150 cursor-pointer overflow-hidden ${
+                className={`relative flex flex-col justify-between p-2 sm:p-2.5 transition-all duration-150 cursor-pointer overflow-hidden ${
                   isSelected && !isExporting
                     ? 'ring-4 ring-indigo-600 ring-inset z-10 scale-[0.99] shadow-lg'
                     : 'hover:brightness-95'
                 }`}
               >
-                {/* Orta eksen çizgisi vurgusu */}
+                {/* Eksen ayrım çizgileri */}
                 {isCenterHoriz && (
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black/40 pointer-events-none" />
+                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-black/50 pointer-events-none" />
                 )}
                 {isCenterVert && (
-                  <div className="absolute top-0 bottom-0 right-0 w-[2px] bg-black/40 pointer-events-none" />
+                  <div className="absolute top-0 bottom-0 right-0 w-[2px] bg-black/50 pointer-events-none" />
                 )}
 
-                {/* Üst Kısım: Fotoğraf (Sol) + Başlık (Sağ) */}
-                <div className="flex items-start gap-2 min-h-[70px]">
+                {/* Üst Kısım: Fotoğraf (Sol) + Dinamik Başlık (Sağ) */}
+                <div className="flex items-start gap-1.5 sm:gap-2">
                   {/* Fotoğraf Kutusu */}
-                  <div className="relative shrink-0 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-black/10 rounded overflow-hidden border border-black/30 shadow-sm flex items-center justify-center">
+                  <div className={`relative shrink-0 ${imgBoxSize} bg-black/10 rounded overflow-hidden border border-black/30 shadow-sm flex items-center justify-center`}>
                     {cell.image ? (
                       <img
                         src={cell.image}
@@ -79,19 +135,20 @@ export default function CompassGrid({
                         crossOrigin="anonymous"
                       />
                     ) : (
-                      <div className="flex flex-col items-center justify-center text-black/40 text-[10px] p-1 text-center">
-                        <Upload size={16} className="mb-0.5 opacity-60" />
+                      <div className="flex flex-col items-center justify-center text-black/40 text-[9px] sm:text-[10px] p-1 text-center">
+                        <Upload size={14} className="mb-0.5 opacity-60" />
                         <span>Resim</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Başlık (Vurucu, kalın, meme stili) */}
-                  <div className="flex-1 min-w-0 flex items-center">
+                  {/* Dinamik Boyutlanan Başlık */}
+                  <div className="flex-1 min-w-0 flex items-center py-0.5">
                     <h3
                       className="font-extrabold text-black leading-tight tracking-tight break-words"
                       style={{
-                        fontSize: gridSize > 4 ? '11px' : 'clamp(12px, 1.4vw, 19px)',
+                        fontSize: titleFontSize,
+                        lineHeight: 1.1,
                         fontFamily: "'Impact', 'Arial Black', -apple-system, sans-serif"
                       }}
                     >
@@ -104,16 +161,17 @@ export default function CompassGrid({
                   </div>
                 </div>
 
-                {/* Alt Kısım: Özellik Maddeleri (- item1 \n - item2) */}
-                <div className="mt-2 flex-1 flex flex-col justify-start">
+                {/* Alt Kısım: Dinamik Boyutlanan Özellik Maddeleri */}
+                <div className="mt-1.5 sm:mt-2 flex-1 flex flex-col justify-start overflow-hidden">
                   <div className="space-y-0.5">
                     {cell.traits && cell.traits.length > 0 ? (
                       cell.traits.filter(Boolean).map((trait, idx) => (
                         <div
                           key={idx}
-                          className="font-bold text-black leading-tight flex items-start gap-1"
+                          className="font-bold text-black flex items-start gap-1"
                           style={{
-                            fontSize: gridSize > 4 ? '10px' : 'clamp(11px, 1.15vw, 14px)',
+                            fontSize: traitFontSize,
+                            lineHeight: 1.18,
                             fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
                           }}
                         >
@@ -123,7 +181,7 @@ export default function CompassGrid({
                       ))
                     ) : (
                       !isExporting && (
-                        <div className="text-black/30 text-[11px] italic">
+                        <div className="text-black/30 text-[10px] italic">
                           - Özellikler ekleyin...
                         </div>
                       )
@@ -131,9 +189,9 @@ export default function CompassGrid({
                   </div>
                 </div>
 
-                {/* Hücre Koordinat Belirteci (Köşede hafif) */}
+                {/* Hücre Koordinatı */}
                 {!isExporting && (
-                  <div className="absolute bottom-0.5 right-1 text-[9px] font-mono text-black/25">
+                  <div className="absolute bottom-0.5 right-1 text-[8px] font-mono text-black/25">
                     [{r},{c}]
                   </div>
                 )}
