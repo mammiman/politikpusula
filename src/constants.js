@@ -4,38 +4,33 @@ export function getQuadrantColor(row, col, totalRows, totalCols) {
   const isLeft = col < totalCols / 2;
 
   if (isTop && isLeft) {
-    // Auth-Left (Kırmızı / Somon)
-    // Kenarlara gittikçe biraz daha doygun, merkeze geldikçe nötrleşebilir veya tutarlı pastel olabilir
     return {
       name: "Otoriter Sol (Auth-Left)",
-      bg: "#fca5a5", // red-300 / pastel red
+      bg: "#fca5a5",
       cardBg: "#fecaca",
       badge: "bg-red-700 text-white",
       border: "#b91c1c"
     };
   } else if (isTop && !isLeft) {
-    // Auth-Right (Mavi)
     return {
       name: "Otoriter Sağ (Auth-Right)",
-      bg: "#93c5fd", // blue-300
+      bg: "#93c5fd",
       cardBg: "#bfdbfe",
       badge: "bg-blue-700 text-white",
       border: "#1d4ed8"
     };
   } else if (!isTop && isLeft) {
-    // Lib-Left (Yeşil)
     return {
       name: "Özgürlükçü Sol (Lib-Left)",
-      bg: "#86efac", // green-300
+      bg: "#86efac",
       cardBg: "#bbf7d0",
       badge: "bg-emerald-700 text-white",
       border: "#15803d"
     };
   } else {
-    // Lib-Right (Sarı / Mor da olabilir ama klasik görseldeki gibi parlak sarı)
     return {
       name: "Özgürlükçü Sağ (Lib-Right)",
-      bg: "#fde047", // yellow-300
+      bg: "#fde047",
       cardBg: "#fef08a",
       badge: "bg-amber-700 text-white",
       border: "#a16207"
@@ -43,10 +38,10 @@ export function getQuadrantColor(row, col, totalRows, totalCols) {
   }
 }
 
-export function createInitialGrid(size = 4) {
+export function createInitialGrid(rows = 4, cols = 4) {
   const cells = [];
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
       cells.push({
         id: `cell-${r}-${c}`,
         row: r,
@@ -60,9 +55,8 @@ export function createInitialGrid(size = 4) {
   return cells;
 }
 
-// Örnek Sıfır Bir dizi şablonu (Kullanıcının attığı fotoğraftaki gibi!)
+// Örnek Sıfır Bir dizi şablonu (4x4)
 export const DEMO_PRESET_4X4 = [
-  // Satır 0
   {
     row: 0, col: 0,
     title: "cezaevi müdürü",
@@ -87,8 +81,6 @@ export const DEMO_PRESET_4X4 = [
     image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=300&auto=format&fit=crop&q=60",
     traits: ["2017 seçmelerde katılıp 1 bölüm oynayıp ugura kanıp gg oldular"]
   },
-
-  // Satır 1
   {
     row: 1, col: 0,
     title: "Garibin bacısı",
@@ -113,8 +105,6 @@ export const DEMO_PRESET_4X4 = [
     image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=60",
     traits: ["Kadın çocuk düşmanı", "Düğünde gg olmuştur"]
   },
-
-  // Satır 2
   {
     row: 2, col: 0,
     title: "Dizideki içkici kız",
@@ -139,8 +129,6 @@ export const DEMO_PRESET_4X4 = [
     image: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=300&auto=format&fit=crop&q=60",
     traits: ["kardeşlerinin intikamını alamadı", "ömrü bok yoluna gitti"]
   },
-
-  // Satır 3
   {
     row: 3, col: 0,
     title: "tefecinin karısı",

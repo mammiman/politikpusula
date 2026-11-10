@@ -4,7 +4,8 @@ import { getQuadrantColor } from './constants';
 
 export default function CellEditor({
   cell,
-  gridSize,
+  gridRows,
+  gridCols,
   onUpdateCell,
   onClose
 }) {
@@ -12,7 +13,7 @@ export default function CellEditor({
 
   if (!cell) {
     return (
-      <div className="bg-white border border-gray-200 rounded-lg p-6 text-center text-gray-500 shadow-sm">
+      <div className="bg-white border border-gray-200 rounded-lg p-6 text-center text-gray-500 shadow-2xs">
         <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
           <ImageIcon size={20} />
         </div>
@@ -24,7 +25,7 @@ export default function CellEditor({
     );
   }
 
-  const quadrant = getQuadrantColor(cell.row, cell.col, gridSize, gridSize);
+  const quadrant = getQuadrantColor(cell.row, cell.col, gridRows, gridCols);
 
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
@@ -65,7 +66,7 @@ export default function CellEditor({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col gap-4 text-gray-800">
+    <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-2xs flex flex-col gap-4 text-gray-800">
       {/* Header */}
       <div className="flex items-center justify-between pb-3 border-b border-gray-100">
         <div className="flex items-center gap-2">
@@ -133,7 +134,7 @@ export default function CellEditor({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full py-1.5 px-3 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 border border-gray-300 rounded text-xs font-medium flex items-center justify-center gap-1.5 shadow-sm transition"
+                className="w-full py-1.5 px-3 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 border border-gray-300 rounded text-xs font-medium flex items-center justify-center gap-1.5 shadow-2xs transition"
               >
                 <Upload size={13} /> Dosyadan Fotoğraf Seç
               </button>
@@ -158,7 +159,7 @@ export default function CellEditor({
             placeholder="Örn: cezaevi müdürü, Sazcı mahkum..."
             value={cell.title || ''}
             onChange={(e) => onUpdateCell({ ...cell, title: e.target.value })}
-            className="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-500 font-semibold shadow-sm"
+            className="w-full bg-white border border-gray-300 rounded px-3 py-1.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-500 font-semibold shadow-2xs"
           />
         </div>
       </div>
